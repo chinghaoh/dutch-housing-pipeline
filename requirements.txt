@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+aiomysql
+alembic
+pydantic
+pydantic-settings
+httpx
+python-dotenv
