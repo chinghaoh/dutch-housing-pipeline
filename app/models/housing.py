@@ -1,7 +1,6 @@
 """SQLAlchemy ORM model representing the housing_records table."""
 
-from sqlalchemy import Column, Integer, String, Float, DateTime, UniqueConstraint
-from sqlalchemy.sql import func
+from sqlalchemy import Column, Integer, String, Float, UniqueConstraint
 from app.database import Base
 
 
