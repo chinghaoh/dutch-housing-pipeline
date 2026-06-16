@@ -2,6 +2,8 @@
 
 A backend data pipeline that fetches housing market data from the CBS (Dutch Statistics Bureau) OpenData API, stores it in MySQL, and exposes it via a FastAPI REST API.
 
+> Built as a portfolio project to demonstrate data pipeline architecture patterns used in proptech — fetching, transforming, and serving real Dutch housing data from government open data sources.
+
 ## Stack
 - **FastAPI** — REST API framework
 - **SQLAlchemy** — async ORM for MySQL
@@ -19,23 +21,22 @@ A backend data pipeline that fetches housing market data from the CBS (Dutch Sta
 
 ## Project Structure
 dutch-housing-pipeline/
-
 ├── app/
 │   ├── config/
-│   │   └── nl_regions.py        # NL region codes and names
+│   │   └── nl_regions.py             # NL region codes and names
 │   ├── models/
-│   │   └── housing.py           # SQLAlchemy ORM model
+│   │   └── housing.py                # SQLAlchemy ORM model
 │   ├── repositories/
-│   │   └── housing_repository.py # Database operations
+│   │   └── housing_repository.py     # Database operations
 │   ├── routers/
-│   │   └── nl_housing.py        # FastAPI endpoints
+│   │   └── nl_housing.py             # FastAPI endpoints
 │   ├── services/
-│   │   ├── opendata_client.py   # Generic CBS OData client
-│   │   └── nl_housing_service.py # NL housing data + ACL
-│   ├── database.py              # Engine, session, Base
-│   └── schemas.py               # Pydantic schemas
-├── alembic/                     # Database migrations
-├── main.py                      # Application entry point
+│   │   ├── opendata_client.py        # Generic CBS OData client
+│   │   └── nl_housing_service.py     # NL housing data + ACL
+│   ├── database.py                   # Engine, session, Base
+│   └── schemas.py                    # Pydantic schemas
+├── alembic/                          # Database migrations
+├── main.py                           # Application entry point
 ├── requirements.txt
 ├── docker-compose.yml
 ├── .env.example
@@ -54,6 +55,15 @@ cd dutch-housing-pipeline
 cp .env.example .env
 ```
 
+Your `.env` should look like this:
+```env
+DATABASE_URL=mysql+mysqlconnector://myuser:mypassword@localhost:3306/dutch_housing
+MYSQL_ROOT_PASSWORD=changeme
+MYSQL_DATABASE=dutch_housing
+MYSQL_USER=myuser
+MYSQL_PASSWORD=mypassword
+CBS_API_BASE_URL=https://opendata.cbs.nl/ODataApi/odata/
+```
 **3. Start MySQL:**
 ```bash
 docker-compose up -d
@@ -75,6 +85,8 @@ uvicorn main:app --reload
 ```
 
 **7. Open API docs:**
+Visit `http://localhost:8000/docs` for the interactive Swagger UI.
+
 ## Endpoints
 
 | Method | Endpoint | Description |
@@ -93,4 +105,3 @@ uvicorn main:app --reload
 - Add Belgian housing data (CadGis) via a new `BEHousingService`
 - Scheduled sync using APScheduler or Celery
 - Redis caching layer for frequently requested regions
-- Kadaster transaction data with API access
