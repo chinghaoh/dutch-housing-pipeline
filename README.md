@@ -57,7 +57,7 @@ cp .env.example .env
 
 Your `.env` should look like this:
 ```env
-DATABASE_URL=mysql+mysqlconnector://myuser:mypassword@localhost:3306/dutch_housing
+DATABASE_URL=mysql+aiomysql://myuser:mypassword@localhost:3306/dutch_housing
 MYSQL_ROOT_PASSWORD=changeme
 MYSQL_DATABASE=dutch_housing
 MYSQL_USER=myuser
