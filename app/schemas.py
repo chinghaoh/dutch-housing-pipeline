@@ -2,7 +2,7 @@
 """
 
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class HousingRecordBase(BaseModel):
@@ -34,3 +34,15 @@ class SyncResponse(BaseModel):
     """Schema for the /sync endpoint response."""
     message: str
     records_synced: int
+
+
+class PaginatedHousingResponse(BaseModel):
+    """Paginated response wrapper.
+
+    Separating pagination metadata from data makes it easy for clients
+    to know how many records exist and how to fetch the next page.
+    """
+    total: int
+    skip: int
+    limit: int
+    data: List[HousingRecordResponse]

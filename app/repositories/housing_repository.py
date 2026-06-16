@@ -1,9 +1,8 @@
-"""Repository for housing record database operations.
-"""
+"""Repository for housing record database operations."""
 
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, Sequence, and_
+from sqlalchemy import select, func, Sequence, and_
 from app.models.housing import HousingRecord
 
 logger = logging.getLogger(__name__)
@@ -15,9 +14,19 @@ class HousingRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_all(self) -> Sequence[HousingRecord]:
-        result = await self.db.execute(select(HousingRecord))
-        return result.scalars().all()
+    async def get_all(self, skip: int = 0, limit: int = 100) -> tuple[int, Sequence[HousingRecord]]:
+        """Returns paginated records and total count.
+
+        """
+        total_result = await self.db.execute(select(func.count()).select_from(HousingRecord))
+        total = total_result.scalar_one()
+
+        records_result = await self.db.execute(
+            select(HousingRecord).offset(skip).limit(limit)
+        )
+        records = records_result.scalars().all()
+
+        return total, records
 
     async def get_by_region(self, region: str) -> Sequence[HousingRecord]:
         result = await self.db.execute(

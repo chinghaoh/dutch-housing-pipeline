@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.repositories.housing_repository import HousingRepository
-from app.schemas import HousingRecordResponse, SyncResponse
+from app.schemas import HousingRecordResponse, SyncResponse, PaginatedHousingResponse
 from app.services.nl_housing_service import NLHousingService
 
 logger = logging.getLogger(__name__)
@@ -25,12 +25,20 @@ def get_repository(db: AsyncSession = Depends(get_db)) -> HousingRepository:
     return HousingRepository(db)
 
 
-@router.get("/", response_model=list[HousingRecordResponse])
-async def get_all_housing(
-    repo: HousingRepository = Depends(get_repository),
+@router.get("/", response_model=PaginatedHousingResponse)
+async def get_all(
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_db)
 ):
-    """Returns all housing records."""
-    return await repo.get_all()
+    repo = HousingRepository(db)
+    total, records = await repo.get_all(skip=skip, limit=limit)
+    return PaginatedHousingResponse(
+        total=total,
+        skip=skip,
+        limit=limit,
+        data=records
+    )
 
 
 @router.get("/{region}", response_model=list[HousingRecordResponse])
@@ -40,8 +48,9 @@ async def get_housing_by_region(
 ):
     """Returns all housing records for a specific region.
 
-    Args:
-        region: Region name e.g. 'Groningen'.
+    Available regions: Netherlands (whole country), Groningen, Fryslân, Drenthe,
+    Overijssel, Flevoland, Gelderland, Utrecht, Noord-Holland,
+    Zuid-Holland, Zeeland, Noord-Brabant, Limburg.
     """
     records = await repo.get_by_region(region)
     if not records:
